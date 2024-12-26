@@ -61,6 +61,7 @@ void bmf_play_instrument(bmf_instrument* instrument, bmf_channel_type channel_ty
         duty_cycle = instrument->duty_cycle[idx_duty_cycle] / 65536.f;
         freq = (int16_t)instrument->pitch[idx_pitch] + frequency;
         if (freq >= 65536) freq = 65535;
+        printf("%f %f %d\n", volume, duty_cycle, freq);
     }
     for (int i = 0; i < num_samples; i++) {
         float sample = bmf_sample(channel_type, freq, duty_cycle, *timer);

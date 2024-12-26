@@ -4,7 +4,7 @@
 #include "bmf/bmf.h"
 
 void pattern_editor(bmf_song* curr_song, int* curr_channel);
-void piano_roll(bmf_song* curr_song, int curr_channel);
+void piano_roll(bmf_song* curr_song, bmf_instrument* curr_instrument, int curr_channel);
 void synth_test();
 
 #endif

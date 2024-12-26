@@ -178,6 +178,6 @@ void editor_update() {
     window_end();
 
     window_begin("Piano Roll");
-    piano_roll(curr_song, curr_channel);
+    piano_roll(curr_song, curr_instrument, curr_channel);
     window_end();
 }

@@ -15,9 +15,15 @@ bmf_instrument* bmf_add_instrument(bmf* data) {
     memset(instrument, 0, sizeof(bmf_instrument));
     instrument->size = sizeof(bmf_instrument);
     instrument->parent = data;
+    instrument->num_volume     = 1;
+    instrument->num_pitch      = 1;
+    instrument->num_duty_cycle = 1;
     instrument->volume     = malloc(1);
     instrument->pitch      = malloc(1);
     instrument->duty_cycle = malloc(1);
+    instrument->volume    [0] = 0xFFFF;
+    instrument->pitch     [0] = 0x0000;
+    instrument->duty_cycle[0] = 0x8000;
     instrument->parent = data;
     return instrument;
 }

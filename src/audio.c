@@ -12,9 +12,7 @@ struct AudioBuffer {
 };
 
 struct AudioBuffer *audio_buffers, *audio_buffers_head;
-bool audio_running = false;
 short audio_final_samples[1600];
-pthread_t audio_thread_id;
 
 short* audio_create_sample_buffer() {
     if (!audio_buffers) audio_buffers = audio_buffers_head = calloc(sizeof(struct AudioBuffer), 1);
@@ -28,7 +26,7 @@ int audio_num_samples() {
     return 1600;
 }
 
-void* audio_thread(void* _) {
+void audio_init() {
     SDL_AudioSpec spec;
     spec.freq = 48000;
     spec.format = AUDIO_S16SYS;
@@ -37,20 +35,6 @@ void* audio_thread(void* _) {
     spec.callback = NULL;
     SDL_OpenAudio(&spec, NULL);
     SDL_PauseAudio(0);
-    audio_running = true;
-    FILE* f = fopen("test.pcm", "w");
-    while (audio_running) {
-        while (SDL_GetQueuedAudioSize(1) > sizeof(audio_final_samples)) SDL_Delay(1);
-        fwrite(audio_final_samples, sizeof(audio_final_samples), 1, f);
-        SDL_QueueAudio(1, audio_final_samples, sizeof(audio_final_samples));
-    }
-    fclose(f);
-    SDL_CloseAudio();
-    return NULL;
-}
-
-void audio_init() {
-    pthread_create(&audio_thread_id, NULL, audio_thread, NULL);
 }
 
 void audio_update() {
@@ -67,10 +51,11 @@ void audio_update() {
         free(curr);
         curr = next;
     }
+    while (SDL_GetQueuedAudioSize(1) > sizeof(audio_final_samples)) usleep(1);
+    SDL_QueueAudio(1, audio_final_samples, sizeof(audio_final_samples));
     audio_buffers = NULL;
 }
 
 void audio_deinit() {
-    audio_running = false;
-    pthread_join(audio_thread_id, NULL);
+    SDL_CloseAudio();
 }

@@ -45,6 +45,7 @@ static int piano_roll_frame = 0;
 
 void piano_roll(bmf_song* curr_song, bmf_instrument* curr_instrument, int curr_channel) {
     if (!curr_song) return;
+    if (bmf_num_channels(curr_song) == 0) return;
     window_handle_zoom(1.1, true, false, 1 / 32.f, 32);
     int pattern_size = 256 * window_zoom();
     window_scroll_mode(false, false);
@@ -56,7 +57,7 @@ void piano_roll(bmf_song* curr_song, bmf_instrument* curr_instrument, int curr_c
     int playing_piano_note = -1;
     if (drag(&start_x, &start_y, &end_x, &end_y, SDL_BUTTON_LEFT)) {
         if (start_x < 48) playing_piano_note = NOTES - (end_y - 16) / 16 - 1;
-        bmf_play_instrument(
+        if (playing_piano_note >= 0 && playing_piano_note < NOTES) bmf_play_instrument(
             curr_instrument,
             bmf_get_ro(bmf_get_channels(curr_song), curr_channel),
             audio_create_sample_buffer(), audio_num_samples(),
