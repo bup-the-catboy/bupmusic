@@ -68,15 +68,15 @@ struct bmf {
     int num_songs;
     int num_instruments;
     int frame;
-    int timer;
     float tempo;
     float master_volume;
     float channel_volumes[256];
+    uint64_t timer;
     bmf_song* songs;
     bmf_instrument* instruments;
 };
 
-void bmf_synth_frame(bmf_song* song, short* buf_out, int* timer, float frame, float tempo, int channel);
+void bmf_synth_frame(bmf_song* song, short* buf_out, uint64_t* timer, float frame, float tempo, int channel);
 void bmf_mix(short* dst, short* src, int samples);
 void bmf_volume(short* samples, float volume, int num_samples);
 

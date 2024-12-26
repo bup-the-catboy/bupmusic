@@ -40,7 +40,7 @@ const char* note_name_table[] = {
     "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
 };
 
-static int piano_roll_timer = 0;
+static uint64_t piano_roll_timer = 0;
 static int piano_roll_frame = 0;
 
 void piano_roll(bmf_song* curr_song, bmf_instrument* curr_instrument, int curr_channel) {

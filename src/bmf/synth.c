@@ -50,7 +50,7 @@ float bmf_sample(bmf_channel_type channel_type, uint16_t frequency, float duty_c
     return sample * 0.2; // on its own its very loud
 }
 
-void bmf_play_instrument(bmf_instrument* instrument, bmf_channel_type channel_type, short* samples_out, int num_samples, uint16_t frequency, float duty_cycle, uint8_t frame, int* timer) {
+void bmf_play_instrument(bmf_instrument* instrument, bmf_channel_type channel_type, short* samples_out, int num_samples, uint16_t frequency, float duty_cycle, uint8_t frame, uint64_t* timer) {
     float volume = 1;
     int freq = frequency;
     if (instrument) {
@@ -61,18 +61,17 @@ void bmf_play_instrument(bmf_instrument* instrument, bmf_channel_type channel_ty
         duty_cycle = instrument->duty_cycle[idx_duty_cycle] / 65536.f;
         freq = (int16_t)instrument->pitch[idx_pitch] + frequency;
         if (freq >= 65536) freq = 65535;
-        printf("%f %f %d\n", volume, duty_cycle, freq);
     }
     for (int i = 0; i < num_samples; i++) {
-        float sample = bmf_sample(channel_type, freq, duty_cycle, *timer);
+        float sample = bmf_sample(channel_type, freq, duty_cycle, (*timer) / freq);
         if (sample < -1) sample = -1;
         if (sample >  1) sample =  1;
         samples_out[i] = sample * volume * 32767;
-        (*timer)++;
+        (*timer) += freq;
     }
 }
 
-void bmf_synth_frame(bmf_song* song, short* buf_out, int* timer, float frame, float tempo, int channel) {
+void bmf_synth_frame(bmf_song* song, short* buf_out, uint64_t* timer, float frame, float tempo, int channel) {
     bmf_note_instance note_instances[32];
     int num_note_instances = 0; //  vvvvv  60[sec in min] * 60[fps] / 64[units per beat]
     int frame_to_unit = song->bpm / 56.25f;

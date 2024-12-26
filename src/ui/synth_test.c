@@ -10,15 +10,12 @@ static int synth_test_wave_type = 0;
 static int synth_test_frequency = 500;
 static bool synth_test_playing = false;
 static pthread_t synth_test_thread_id;
-static int synth_test_timer = 0;
+static uint64_t synth_test_timer = 0;
 static float synth_test_duty_cycle = 0.5;
 
 void synth_test() {
     igCombo_Str("Wave Type", &synth_test_wave_type, "Square\0Triangle\0Sine\0Sawtooth\0Noise\0", 0);
-    int prev_freq = synth_test_frequency;
-    if (igSliderInt("Frequency", &synth_test_frequency, 1, 1000, "%d", ImGuiSliderFlags_None)) {
-        synth_test_timer *= (prev_freq / (float)synth_test_frequency);
-    }
+    igSliderInt("Frequency", &synth_test_frequency, 1, 1000, "%d", ImGuiSliderFlags_None);
     igSliderFloat("Duty Cycle", &synth_test_duty_cycle, 0, 1, "%.3f", ImGuiSliderFlags_None);
     if (igButton(synth_test_playing ? "Stop" : "Play", (ImVec2){ 0, 0 })) synth_test_playing ^= 1;
 
