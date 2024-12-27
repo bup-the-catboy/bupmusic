@@ -23,19 +23,19 @@ int interpolate_signed(bmf_note_instance* instance) {
     return (to - from) * (instance->time / (float)instance->note->length) + from;
 }
 
-float frac(float x) {
-    return x - floorf(x);
+double frac(double x) {
+    return x - floor(x);
 }
 
-float bmf_sample(bmf_channel_type channel_type, uint16_t frequency, float duty_cycle, int sample_index) {
-    float t = sample_index / (float)SAMPLE_RATE;
+float bmf_sample(bmf_channel_type channel_type, uint16_t frequency, float duty_cycle, uint64_t sample_index) {
+    double t = sample_index / (double)SAMPLE_RATE;
     float sample;
     switch (channel_type) {
         case bmf_channel_type_square:
             sample = frac(t * frequency / 2) < duty_cycle ? 0.5f : -0.5f;
             break;
         case bmf_channel_type_triangle:
-            sample = fabsf(frac(t * frequency / 2) * 2 - 1) * 2 - 1;
+            sample = fabs(frac(t * frequency / 2) * 2 - 1) * 2 - 1;
             break;
         case bmf_channel_type_sine:
             sample = sin((t * frequency / 2) * 2 * M_PI);

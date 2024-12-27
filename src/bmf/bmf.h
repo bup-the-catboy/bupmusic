@@ -51,7 +51,7 @@ void    bmf_channel_volume        (bmf* data, float vol, uint8_t channel);
 void    bmf_play                  (bmf* data, short* samples_out, int num_out);
 void    bmf_destroy               (bmf* data);
 void    bmf_play_instrument       (bmf_instrument* instrument, bmf_channel_type channel_type, short* samples_out, int num_samples, uint16_t frequency, float duty_cycle, uint8_t frame, uint64_t* timer);
-float   bmf_sample                (bmf_channel_type channel_type, uint16_t frequency, float duty_cycle, int sample_index);
+float   bmf_sample                (bmf_channel_type channel_type, uint16_t frequency, float duty_cycle, uint64_t sample_index);
 
 bmf_instrument* bmf_get_instruments           (bmf* data);
 bmf_instrument* bmf_add_instrument            (bmf* data);
