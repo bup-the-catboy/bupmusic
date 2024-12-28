@@ -19,6 +19,7 @@ struct WindowData {
 
 struct WindowData *window_data, *window_data_head;
 int dragging, dragging_start_x, dragging_start_y;
+ImGuiID dragging_window;
 
 void register_window(ImGuiID id) {
     if (window_data == NULL) window_data = window_data_head = calloc(sizeof(struct WindowData), 1);
@@ -175,6 +176,14 @@ int cursor_y() {
     return cursor_rel_y() - render_translate_y;
 }
 
+int rel_x(int pos) {
+    return pos + render_translate_x;
+}
+
+int rel_y(int pos) {
+    return pos + render_translate_y;
+}
+
 bool hovered(int x, int y, int w, int h) {
     return cursor_x() >= x && cursor_y() >= y && cursor_x() < x + w && cursor_y() < y + h && igIsWindowHovered(ImGuiHoveredFlags_None);
 }
@@ -185,6 +194,8 @@ bool clicked(int x, int y, int w, int h, int button) {
 
 bool drag(int* start_x, int* start_y, int* end_x, int* end_y, int button) {
     if (!(dragging & SDL_BUTTON(button))) return false;
+    if (just_started_dragging && igIsWindowHovered(ImGuiHoveredFlags_None)) dragging_window = igGetItemID();
+    if (dragging_window != igGetItemID()) return false;
     ImVec2 window_pos;
     igGetWindowPos(&window_pos);
     if (start_x) *start_x = dragging_start_x - window_pos.x - render_translate_x;

@@ -18,6 +18,8 @@ int cursor_x();
 int cursor_y();
 int cursor_rel_x();
 int cursor_rel_y();
+int rel_x(int pos);
+int rel_y(int pos);
 bool clicked(int x, int y, int w, int h, int button);
 bool hovered(int x, int y, int w, int h);
 bool drag(int* start_x, int* start_y, int* end_x, int* end_y, int button);

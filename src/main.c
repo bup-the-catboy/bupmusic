@@ -19,6 +19,7 @@ SDL_Window* window;
 SDL_Renderer* renderer;
 int click_state = 0;
 int scroll_state = 0;
+bool just_started_dragging = false;
 
 void create_dockspace_layout(ImGuiID dockspace) {
     if (imgui_config_exists) return;
@@ -71,10 +72,12 @@ int main() {
         SDL_Event event;
         click_state = 0;
         scroll_state = 0;
+        just_started_dragging = false;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) running = false;
             if (event.type == SDL_MOUSEBUTTONDOWN) {
                 click_state |= event.button.button;
+                just_started_dragging = true;
                 window_begin_drag(event.button.button);
             }
             if (event.type == SDL_MOUSEBUTTONUP) window_end_drag();
