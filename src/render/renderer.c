@@ -269,3 +269,26 @@ int text_size(const char* fmt, ...) {
     va_end(list);
     return text_size_internal(buf);
 }
+
+#define clamp(a, b, x) ((x) < (a) ? (a) : ((x) > (b) ? (b) : (x)))
+#define color(x) clamp(0, 255, x)
+#define rgb(r, g, b) (color(r) << 24) | (color(g) << 16) | (color(b) << 8)
+#define off 0
+#define on  255
+#define in  (int)(x * 255)
+#define out 255 - in
+
+unsigned int hue(float h) {
+    h = clamp(0, 1, h);
+    int i = (int)(h * 6);
+    float x = (h * 6) - i;
+    switch (i) {
+        case 0: return rgb(on,  in,  off);
+        case 1: return rgb(out, on,  off);
+        case 2: return rgb(off, on,  in);
+        case 3: return rgb(off, out, on);
+        case 4: return rgb(in,  off, on);
+        case 5: return rgb(on,  off, out);
+    }
+    return rgb(on, off, on);
+}

@@ -67,6 +67,22 @@ void pattern_editor(bmf_song* curr_song, int* curr_channel) {
             else if (a || b) render_set_color(0x3F3F3FFF);
             else             render_set_color(0x2F2F2FFF);
             render_rect_fill(40 + j * 74, 20 + i * 74, 72, 72);
+            bmf_pattern* pattern = bmf_get_pattern(curr_song, bmf_get_pattern_table_at(curr_song, i, j));
+            if (pattern) {
+                unsigned int color = hue(j / (float)bmf_get_length(curr_song));
+                render_set_color(color | 0xFF);
+                render_rect_fill(40 + j * 74, 20 + i * 74, 72, 16);
+                render_set_color(color | 0x7F);
+                render_rect_fill(40 + j * 74, 36 + i * 74, 72, 56);
+                render_set_color(0x000000FF);
+                render_text(41 + j * 74, 24 + i * 74, "Ptrn %d", bmf_get_pattern_index(pattern) + 1);
+            }
+            if (clicked(40 + j * 74, 20 + i * 74, 72, 72, SDL_BUTTON_LEFT)) {
+                if (!pattern) {
+                    pattern = bmf_add_pattern(curr_song);
+                    bmf_set_pattern_table_at(curr_song, i, j, bmf_get_pattern_index(pattern));
+                }
+            }
         }
     }
     render_unscissor();

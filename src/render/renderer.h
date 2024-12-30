@@ -19,4 +19,6 @@ void render_unscissor    ();
 
 int text_size(const char* fmt, ...);
 
+unsigned int hue(float h);
+
 #endif

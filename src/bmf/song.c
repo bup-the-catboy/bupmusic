@@ -86,12 +86,20 @@ void bmf_add_channel_at(bmf_song* song, bmf_channel_type type, uint8_t index) {
     free(song->pattern_table);
     song->channel_table = new_channel_table;
     song->pattern_table = new_pattern_table;
+    for (int i = 0; i < song->length; i++) {
+        bmf_clear_pattern_table_at(song, index, i);
+    }
 }
 
 uint8_t* bmf_get_pattern_table(bmf_song* song) {
     uint8_t* pattern_table = malloc(song->channels * song->length);
     memcpy(pattern_table, song->pattern_table, song->channels * song->length);
     return pattern_table;
+}
+
+uint8_t bmf_get_pattern_table_at(bmf_song* song, uint8_t channel, uint8_t position) {
+    if (channel >= song->channels || position >= song->length) return 0xFF;
+    return song->pattern_table[channel * song->length + position];;
 }
 
 void bmf_set_pattern_table_at(bmf_song* song, uint8_t channel, uint8_t position, uint8_t index) {
@@ -123,13 +131,8 @@ bmf_channel_type* bmf_get_channels(bmf_song* song) {
     return types;
 }
 
-bmf_pattern* bmf_get_patterns(bmf_song* song) {
-    return song->pattern_data;
-}
-
-bmf_pattern* bmf_get_pattern_at(bmf_song* song, uint8_t index) {
-    if (index == 0xFF) return NULL;
-    if (index >= song->patterns) return NULL;
+bmf_pattern* bmf_get_pattern(bmf_song* song, uint8_t index) {
+    if (index == 0xFF || index >= song->patterns) return NULL;
     return &song->pattern_data[index];
 }
 

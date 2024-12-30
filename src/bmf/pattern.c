@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <stdio.h>
+
 bmf_pattern* bmf_add_pattern(bmf_song* song) {
     if (song->patterns == 0xFF) return NULL;
     song->patterns++;
@@ -15,6 +17,10 @@ bmf_pattern* bmf_add_pattern(bmf_song* song) {
     pattern->notes = calloc(sizeof(bmf_note), 1);
     pattern->notes->size = sizeof(bmf_note);
     return pattern;
+}
+
+uint8_t bmf_get_pattern_index(bmf_pattern* pattern) {
+    return ((uintptr_t)pattern - (uintptr_t)pattern->parent->pattern_data) / sizeof(bmf_pattern);
 }
 
 bmf_note* bmf_pattern_get_notes(bmf_pattern* pattern) {
