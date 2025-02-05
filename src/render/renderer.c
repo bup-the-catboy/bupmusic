@@ -1,6 +1,9 @@
 #include "renderer.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "main.h"
 
@@ -112,8 +115,13 @@ void render_fill_auto(int* pos, int* len, int size) {
 }
 
 void render_get_size(int* w, int* h) {
+    float width, height;
     SDL_Texture* texture = SDL_GetRenderTarget(renderer);
-    if (texture) SDL_QueryTexture(texture, NULL, NULL, w, h);
+    if (texture) {
+        SDL_GetTextureSize(texture, &width, &height);
+        if (w) *w = width;
+        if (h) *h = height;
+    }
     else SDL_GetWindowSize(window, w, h);
 }
 
@@ -123,7 +131,7 @@ void render_rect_fill(int x, int y, int w, int h) {
     render_fill_auto(&x, &w, width);
     render_fill_auto(&y, &h, height);
     if (w < 0 || h < 0) return;
-    SDL_Rect rect = (SDL_Rect){ x + render_translate_x, y + render_translate_y, w, h };
+    SDL_FRect rect = (SDL_FRect){ x + render_translate_x, y + render_translate_y, w, h };
     SDL_RenderFillRect(renderer, &rect);
 }
 
@@ -133,8 +141,8 @@ void render_rect_outl(int x, int y, int w, int h) {
     render_fill_auto(&x, &w, width);
     render_fill_auto(&y, &h, height);
     if (w < 0 || h < 0) return;
-    SDL_Rect rect = (SDL_Rect){ x + render_translate_x, y + render_translate_y, w, h };
-    SDL_RenderDrawRect(renderer, &rect);
+    SDL_FRect rect = (SDL_FRect){ x + render_translate_x, y + render_translate_y, w, h };
+    SDL_RenderRect(renderer, &rect);
 }
 
 void render_circle(int x, int y, int r) {
@@ -142,7 +150,7 @@ void render_circle(int x, int y, int r) {
         for (int Y = 0; Y < r * 2; Y++) {
             int dx = r - X;
             int dy = r - Y;
-            if (dx * dx + dy * dy < r * r) SDL_RenderDrawPoint(renderer, x + dx + render_translate_x, y + dy + render_translate_y);
+            if (dx * dx + dy * dy < r * r) SDL_RenderPoint(renderer, x + dx + render_translate_x, y + dy + render_translate_y);
         }
     }
 }
@@ -163,7 +171,7 @@ void render_line(int x1, int y1, int x2, int y2) {
     if (x2 == AUTO && x1 != AUTO) x2 = x1;
     if (y1 == AUTO && y2 != AUTO) y1 = y2;
     if (y2 == AUTO && y1 != AUTO) y2 = y1;
-    SDL_RenderDrawLine(renderer, x1 + render_translate_x, y1 + render_translate_y, x2 + render_translate_x, y2 + render_translate_y);
+    SDL_RenderLine(renderer, x1 + render_translate_x, y1 + render_translate_y, x2 + render_translate_x, y2 + render_translate_y);
 }
 
 void render_scissor(int x, int y, int w, int h) {
@@ -172,11 +180,11 @@ void render_scissor(int x, int y, int w, int h) {
     render_fill_auto(&x, &w, width);
     render_fill_auto(&y, &h, height);
     SDL_Rect rect = (SDL_Rect){ x, y, w, h };
-    SDL_RenderSetClipRect(renderer, &rect);
+    SDL_SetRenderClipRect(renderer, &rect);
 }
 
 void render_unscissor() {
-    SDL_RenderSetClipRect(renderer, NULL);
+    SDL_SetRenderClipRect(renderer, NULL);
 }
 
 int text_size_internal(const char* string) {
@@ -212,9 +220,10 @@ void create_font_texture() {
     for (int i = 0; i < 98 * 98; i++) {
         data[i] = ((font[i / 8] >> (7 - (i % 8))) & 1) ? 0xFFFFFFFF : 0x00000000;
     }
-    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(data, 98, 98, 32, 98 * 4, SDL_PIXELFORMAT_RGBA8888);
+    SDL_Surface* surface = SDL_CreateSurfaceFrom(98, 98, SDL_PIXELFORMAT_ABGR8888, data, 4 * 98);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
+    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+    SDL_DestroySurface(surface);
     free(data);
     font_texture = texture;
     uint8_t r, g, b, a;
@@ -236,9 +245,9 @@ void render_text_internal(int x, int y, float ax, float ay, const char* string) 
             y += 12;
         }
         if (c < 32 || c > 126) continue;
-        SDL_Rect src = (SDL_Rect){ ((c - 32) % 14) * 7, ((c - 32) / 14) * 12 + 1, 7, 12 };
-        SDL_Rect dst = (SDL_Rect){ x + render_translate_x, y + render_translate_y, 7, 12 };
-        SDL_RenderCopy(renderer, font_texture, &src, &dst);
+        SDL_FRect src = (SDL_FRect){ ((c - 32) % 14) * 7, (int)((c - 32) / 14) * 12 + 1, 7, 12 };
+        SDL_FRect dst = (SDL_FRect){ x + render_translate_x, y + render_translate_y, 7, 12 };
+        SDL_RenderTexture(renderer, font_texture, &src, &dst);
         x += 7;
     }
 }

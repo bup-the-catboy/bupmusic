@@ -18,16 +18,6 @@ void icon_draw_triangle(int x, int y) {
     render_triangle(16 + x, 4 + y, 4 + x, 28 + y, 28 + x, 28 + y);
 }
 
-void icon_draw_sine(int x, int y) {
-    icon_draw_outline(x, y);
-    render_circle(16 + x, 16 + y, 12);
-}
-
-void icon_draw_sawtooth(int x, int y) {
-    icon_draw_outline(x, y);
-    render_triangle(28 + x, 4 + y, 4 + x, 28 + y, 28 + x, 28 + y);
-}
-
 void icon_draw_noise(int x, int y) {
     icon_draw_outline(x, y);
     for (int i = 0; i < 4; i++) {

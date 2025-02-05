@@ -1,6 +1,5 @@
-#include <SDL2/SDL.h>
-
 #include <pthread.h>
+#include <string.h>
 
 #include "audio.h"
 #include "imgui/cimgui.h"
@@ -19,7 +18,7 @@ static int synth_test_sample_graph_count  = 800;
 void synth_test() {
     bool frozen_flipped = false;
     igSeparatorText("Synth Settings");
-    igCombo_Str("Wave Type", &synth_test_wave_type, "Square\0Triangle\0Sine\0Sawtooth\0Noise\0", 0);
+    igCombo_Str("Wave Type", &synth_test_wave_type, "Square\0Triangle\0Noise\0", 0);
     igSliderInt("Frequency", &synth_test_frequency, 1, 8000, "%d", ImGuiSliderFlags_None);
     igSliderFloat("Duty Cycle", &synth_test_duty_cycle, 0, 1, "%.3f", ImGuiSliderFlags_None);
     igSeparatorText("Controls");

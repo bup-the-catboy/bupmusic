@@ -92,5 +92,13 @@ CIMGUI_API void ImGui_ImplSDL3_Shutdown(void);
 CIMGUI_API void ImGui_ImplSDL3_NewFrame(void);
 CIMGUI_API bool ImGui_ImplSDL3_ProcessEvent(const SDL_Event* event);
 CIMGUI_API void ImGui_ImplSDL3_SetGamepadMode(ImGui_ImplSDL3_GamepadMode mode,SDL_Gamepad** manual_gamepads_array,int manual_gamepads_count);
+CIMGUI_API bool ImGui_ImplSDLRenderer3_Init(SDL_Renderer* renderer);
+CIMGUI_API void ImGui_ImplSDLRenderer3_Shutdown();
+CIMGUI_API void ImGui_ImplSDLRenderer3_NewFrame();
+CIMGUI_API void ImGui_ImplSDLRenderer3_RenderDrawData(ImDrawData* draw_data, SDL_Renderer* renderer);
+CIMGUI_API bool ImGui_ImplSDLRenderer3_CreateFontsTexture();
+CIMGUI_API void ImGui_ImplSDLRenderer3_DestroyFontsTexture();
+CIMGUI_API bool ImGui_ImplSDLRenderer3_CreateDeviceObjects();
+CIMGUI_API void ImGui_ImplSDLRenderer3_DestroyDeviceObjects();
 
 #endif

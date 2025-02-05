@@ -13,11 +13,11 @@ LDFLAGS :=
 LIBS =
 
 ifeq ($(OS),Windows_NT)
-	CFLAGS += -DWINDOWS $(shell pkg-config --static --cflags sdl2)
-	LDFLAGS += $(shell pkg-config --static --libs sdl2)
+	CFLAGS += -DWINDOWS $(shell pkg-config --static --cflags sdl3)
+	LDFLAGS += $(shell pkg-config --static --libs sdl3)
 else
-	CFLAGS += -DWINDOWS $(shell pkg-config --cflags sdl2)
-	LDFLAGS += $(shell pkg-config --libs sdl2) -lm -lstdc++
+	CFLAGS += -DWINDOWS $(shell pkg-config --cflags sdl3)
+	LDFLAGS += $(shell pkg-config --libs sdl3) -lm -lstdc++
 endif
 
 .PHONY: all clean

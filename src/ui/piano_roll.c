@@ -3,7 +3,7 @@
 #include "render/window.h"
 #include "audio.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #define NOTES_PER_OCTAVE 12
 #define OCTAVES           9

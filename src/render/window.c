@@ -2,6 +2,8 @@
 
 #include "main.h"
 #include "renderer.h"
+#include <stdlib.h>
+#include <limits.h>
 
 #include "window.h"
 
@@ -18,18 +20,38 @@ struct WindowData {
 };
 
 struct WindowData *window_data, *window_data_head;
-int dragging, dragging_start_x, dragging_start_y;
+int dragging;
+float dragging_start_x, dragging_start_y;
 ImGuiID dragging_window;
+
+void screenspace(int* width, int* height) {
+    int num_displays = 0;
+    SDL_DisplayID* displays = SDL_GetDisplays(&num_displays);
+    int minX = INT_MAX;
+    int minY = INT_MAX;
+    int maxX = INT_MIN;
+    int maxY = INT_MIN;
+    for (int i = 0; i < num_displays; i++) {
+        SDL_Rect rect;
+        SDL_GetDisplayBounds(displays[i], &rect);
+        if (minX > rect.x) minX = rect.x;
+        if (minY > rect.y) minY = rect.y;
+        if (maxX < rect.x + rect.w) maxX = rect.x + rect.w;
+        if (maxY < rect.y + rect.h) maxY = rect.y + rect.h;
+    }
+    if (width)  *width  = maxX - minX;
+    if (height) *height = maxY - minY;
+}
 
 void register_window(ImGuiID id) {
     if (window_data == NULL) window_data = window_data_head = calloc(sizeof(struct WindowData), 1);
     else window_data_head = window_data_head->next;
     ImVec2 window_size;
     igGetWindowSize(&window_size);
-    SDL_DisplayMode dm;
-    SDL_GetCurrentDisplayMode(0, &dm);
+    int width, height;
+    screenspace(&width, &height);
     window_data_head->next = calloc(sizeof(struct WindowData), 1);
-    window_data_head->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dm.w, dm.h);
+    window_data_head->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
     window_data_head->id = id;
     window_data_head->zoom = 1;
 }
@@ -74,15 +96,15 @@ void window_end_drag() {
 }
 
 void window_handle_scroll(struct WindowData* window) {
-    int x, y;
+    float x, y;
     SDL_GetMouseState(&x, &y);
-    if ((click_state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) && igIsWindowHovered(ImGuiHoveredFlags_None)) {
+    if ((click_state & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) && igIsWindowHovered(ImGuiHoveredFlags_None)) {
         window->scrolling = true;
         window->scroll_origin_x = x;
         window->scroll_origin_y = y;
     }
     if (window->scrolling) {
-        if (dragging & SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
+        if (dragging & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) {
             window->scroll_x += x - window->scroll_origin_x;
             window->scroll_y += y - window->scroll_origin_y;
             window->scroll_origin_x = x;
@@ -130,8 +152,8 @@ void window_begin(const char* name) {
 void window_end() {
     SDL_Texture* texture = SDL_GetRenderTarget(renderer);
     if (texture) {
-        int w, h;
-        SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+        float w, h;
+        SDL_GetTextureSize(texture, &w, &h);
         SDL_SetRenderTarget(renderer, NULL);
         igSetCursorPos((ImVec2){ 0, 0 });
         igImage((ImTextureID)texture, (ImVec2){ w, h }, (ImVec2){ 0, 0 }, (ImVec2){ 1, 1 }, (ImVec4){ 1, 1, 1, 1 }, (ImVec4){ 0, 0, 0, 0 });
@@ -153,7 +175,7 @@ void tooltip(const char* fmt, ...) {
 }
 
 int cursor_rel_x() {
-    int x;
+    float x;
     ImVec2 window_pos;
     igGetWindowPos(&window_pos);
     SDL_GetMouseState(&x, NULL);
@@ -161,7 +183,7 @@ int cursor_rel_x() {
 }
 
 int cursor_rel_y() {
-    int y;
+    float y;
     ImVec2 window_pos;
     igGetWindowPos(&window_pos);
     SDL_GetMouseState(NULL, &y);
@@ -189,11 +211,11 @@ bool hovered(int x, int y, int w, int h) {
 }
 
 bool clicked(int x, int y, int w, int h, int button) {
-    return hovered(x, y, w, h) && (click_state & SDL_BUTTON(button));
+    return hovered(x, y, w, h) && (click_state & SDL_BUTTON_MASK(button));
 }
 
 bool drag(int* start_x, int* start_y, int* end_x, int* end_y, int button) {
-    if (!(dragging & SDL_BUTTON(button))) return false;
+    if (!(dragging & SDL_BUTTON_MASK(button))) return false;
     if (just_started_dragging && igIsWindowHovered(ImGuiHoveredFlags_None)) dragging_window = igGetItemID();
     if (dragging_window != igGetItemID()) return false;
     ImVec2 window_pos;

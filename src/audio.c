@@ -2,15 +2,18 @@
 
 #include <pthread.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 struct AudioBuffer {
     short* samples;
     struct AudioBuffer* next;
 };
 
+SDL_AudioStream* audio_stream;
 struct AudioBuffer *audio_buffers, *audio_buffers_head;
 short audio_final_samples[1600];
 
@@ -27,14 +30,8 @@ int audio_num_samples() {
 }
 
 void audio_init() {
-    SDL_AudioSpec spec;
-    spec.freq = 48000;
-    spec.format = AUDIO_S16SYS;
-    spec.channels = 2;
-    spec.samples = 800;
-    spec.callback = NULL;
-    SDL_OpenAudio(&spec, NULL);
-    SDL_PauseAudio(0);
+    SDL_AudioSpec spec = { SDL_AUDIO_S16, 2, 48000 };
+    audio_stream = SDL_CreateAudioStream(&spec, &spec);
 }
 
 void audio_update() {
@@ -51,11 +48,11 @@ void audio_update() {
         free(curr);
         curr = next;
     }
-    while (SDL_GetQueuedAudioSize(1) > sizeof(audio_final_samples)) usleep(1);
-    SDL_QueueAudio(1, audio_final_samples, sizeof(audio_final_samples));
+    if (SDL_GetAudioStreamQueued(audio_stream) > 0) usleep(1);
+    SDL_PutAudioStreamData(audio_stream, audio_final_samples, sizeof(audio_final_samples));
     audio_buffers = NULL;
 }
 
 void audio_deinit() {
-    SDL_CloseAudio();
+    SDL_DestroyAudioStream(audio_stream);
 }

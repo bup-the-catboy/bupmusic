@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef enum {
     bmf_note_type_audible,
@@ -13,8 +14,6 @@ typedef enum {
 typedef enum {
     bmf_channel_type_square,
     bmf_channel_type_triangle,
-    bmf_channel_type_sine,
-    bmf_channel_type_sawtooth,
     bmf_channel_type_noise,
 } bmf_channel_type;
 

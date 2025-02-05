@@ -6,8 +6,6 @@
 #include "tinyfiledialogs.h"
 #include "editors.h"
 
-#include <SDL2/SDL.h>
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -94,8 +92,6 @@ void editor_update() {
             if (igBeginMenu("Channel", curr_song != NULL)) {
                 if (igMenuItem_Bool("Square",   "", false, true)) bmf_add_channel(curr_song, bmf_channel_type_square);
                 if (igMenuItem_Bool("Triangle", "", false, true)) bmf_add_channel(curr_song, bmf_channel_type_triangle);
-                if (igMenuItem_Bool("Sine",     "", false, true)) bmf_add_channel(curr_song, bmf_channel_type_sine);
-                if (igMenuItem_Bool("Sawtooth", "", false, true)) bmf_add_channel(curr_song, bmf_channel_type_sawtooth);
                 if (igMenuItem_Bool("Noise",    "", false, true)) bmf_add_channel(curr_song, bmf_channel_type_noise);
                 igEndMenu();
             }

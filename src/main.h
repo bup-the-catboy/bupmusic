@@ -1,7 +1,7 @@
 #ifndef BUPMUSIC_MAIN_H
 #define BUPMUSIC_MAIN_H
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <stdbool.h>
 
 extern SDL_Window* window;

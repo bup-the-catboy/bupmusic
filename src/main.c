@@ -1,12 +1,13 @@
-#include <SDL2/SDL_video.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL_hints.h>
+#include <SDL3/SDL.h>
+#include <stdlib.h>
 #include <unistd.h>
 
-#define CIMGUI_USE_SDL2
+#define CIMGUI_USE_SDL3
 #include "imgui/cimgui.h"
 #include "imgui/cimgui_impl.h"
 
@@ -55,41 +56,43 @@ void setup_dockspace() {
 }
 
 int main() {
-    window = SDL_CreateWindow("BupMusic", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_RESIZABLE);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (getenv("WAYLAND_DISPLAY")) SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland");
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+    window = SDL_CreateWindow("BupMusic", 1280, 720, SDL_WINDOW_RESIZABLE);
+    renderer = SDL_CreateRenderer(window, NULL);
     bool running = true;
     igCreateContext(NULL);
     ImGuiIO* io = igGetIO();
     io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io->IniFilename = NULL;
     io->LogFilename = NULL;
-    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
-    ImGui_ImplSDLRenderer2_Init(renderer);
+    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer3_Init(renderer);
     imgui_config_exists = access("imgui.ini", F_OK) == 0;
     audio_init();
     while (running) {
-        uint64_t start = SDL_GetTicks64();
+        uint64_t start = SDL_GetTicks();
         SDL_Event event;
         click_state = 0;
         scroll_state = 0;
         just_started_dragging = false;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) running = false;
-            if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.type == SDL_EVENT_QUIT) running = false;
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
                 click_state |= event.button.button;
                 just_started_dragging = true;
                 window_begin_drag(event.button.button);
             }
-            if (event.type == SDL_MOUSEBUTTONUP) window_end_drag();
-            if (event.type == SDL_MOUSEWHEEL) scroll_state = event.wheel.y;
-            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) window_end_drag();
+            if (event.type == SDL_EVENT_MOUSE_WHEEL) scroll_state = event.wheel.y;
+            ImGui_ImplSDL3_ProcessEvent(&event);
         }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-        ImGui_ImplSDL2_NewFrame();
-        ImGui_ImplSDLRenderer2_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
+        ImGui_ImplSDLRenderer3_NewFrame();
         igNewFrame();
 
         setup_dockspace();
@@ -97,17 +100,17 @@ int main() {
         audio_update();
 
         igRender();
-        ImGui_ImplSDLRenderer2_RenderDrawData(igGetDrawData(), renderer);
+        ImGui_ImplSDLRenderer3_RenderDrawData(igGetDrawData(), renderer);
         SDL_RenderPresent(renderer);
 
-        uint64_t end = SDL_GetTicks64();
+        uint64_t end = SDL_GetTicks();
         int wait = 16 - (int)(end - start);
         if (wait <= 0) continue;
         SDL_Delay(wait);
     }
 
-    ImGui_ImplSDLRenderer2_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
+    ImGui_ImplSDLRenderer3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     igDestroyContext(igGetCurrentContext());
     audio_deinit();
     SDL_DestroyRenderer(renderer);

@@ -1,6 +1,5 @@
 #include "bmf_internal.h"
 
-#include <SDL2/SDL_config.h>
 #include <stdlib.h>
 #include <string.h>
 

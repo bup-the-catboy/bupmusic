@@ -4,6 +4,10 @@
 #include "imgui/cimgui.h"
 #include "bmf/bmf.h"
 
+#include <SDL3/SDL.h>
+
+#include <math.h>
+
 void pattern_editor(bmf_song* curr_song, int* curr_channel) {
     if (!curr_song) return;
     bmf_channel_type* types = bmf_get_channels(curr_song);
@@ -46,12 +50,6 @@ void pattern_editor(bmf_song* curr_song, int* curr_channel) {
                 break;
             case bmf_channel_type_triangle:
                 icon_draw_triangle(4, 22 + i * 74);
-                break;
-            case bmf_channel_type_sine:
-                icon_draw_sine(4, 22 + i * 74);
-                break;
-            case bmf_channel_type_sawtooth:
-                icon_draw_sawtooth(4, 22 + i * 74);
                 break;
             case bmf_channel_type_noise:
                 icon_draw_noise(4, 22 + i * 74);

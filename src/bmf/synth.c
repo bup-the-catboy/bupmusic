@@ -37,12 +37,6 @@ float bmf_sample(bmf_channel_type channel_type, uint16_t frequency, float duty_c
         case bmf_channel_type_triangle:
             sample = fabs(frac(t * frequency / 2) * 2 - 1) * 2 - 1;
             break;
-        case bmf_channel_type_sine:
-            sample = sin((t * frequency / 2) * 2 * M_PI);
-            break;
-        case bmf_channel_type_sawtooth:
-            sample = (frac(t * frequency / 2) * 2 - 1) * 0.75f;
-            break;
         case bmf_channel_type_noise:
             // TODO
             break;
